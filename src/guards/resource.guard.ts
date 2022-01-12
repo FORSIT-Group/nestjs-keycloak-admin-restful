@@ -101,7 +101,7 @@ export class ResourceGuard implements CanActivate {
         token: request.accessToken as string,
         audience: this.keycloak.options.clientId,
         resourceId,
-        scope: scope ? `${resourceType}:${scope}` : undefined,
+        scope: scope ? `${scope}#${resourceType}` : undefined,
         response_mode: resourceHandler
           ? TicketResponseMode.permissions
           : TicketResponseMode.decision,
