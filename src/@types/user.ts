@@ -7,3 +7,8 @@ export interface KeycloakUser {
   family_name: string
   email: string
 }
+
+export interface KeycloakUserAccess {
+  groups: string[]
+  roles: string[]
+}

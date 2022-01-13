@@ -9,7 +9,7 @@ import {
 import { KeycloakService } from '../service'
 import { Reflector } from '@nestjs/core'
 import { META_PUBLIC } from '../decorators/public.decorator'
-import { KeycloakUser } from '../@types/user'
+import { KeycloakUser, KeycloakUserAccess } from '../@types/user'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -40,6 +40,7 @@ export class AuthGuard implements CanActivate {
 
       if (typeof result === 'string') {
         request.user = await this.keycloak.connect.grantManager.userInfo<string, KeycloakUser>(jwt)
+        request.access = await this.keycloak.connect.grantManager.userInfo<string, KeycloakUserAccess>(jwt)
         request.accessToken = jwt
         return true
       }

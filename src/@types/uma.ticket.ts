@@ -5,7 +5,6 @@ export interface TicketForm {
   resourceId?: string
   scope?: string
   response_mode?: TicketResponseMode
-  groups?: string[]
 }
 
 export enum TicketResponseMode {
@@ -21,5 +20,4 @@ export interface TicketPermissionResponse {
   scopes: string[]
   rsid: string
   rsname: string
-  groups: string[]
 }
