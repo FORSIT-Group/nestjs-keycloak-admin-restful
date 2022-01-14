@@ -13,6 +13,7 @@ import { META_SCOPE } from '../decorators/scope.decorator'
 import {
   TicketResponseMode,
   TicketPermissionResponse,
+  TicketDecisionResponse
 } from '../@types/uma.ticket'
 import { META_RESOURCE } from '../decorators/resource.decorator'
 import { META_PUBLIC } from '../decorators/public.decorator'
@@ -63,8 +64,15 @@ export class ResourceGuard implements CanActivate {
         audience: this.keycloak.options.clientId,
         resourceId: resource,
         scope: scope ? `${scope}` : undefined,
-        response_mode: TicketResponseMode.permissions,
+        response_mode: scope? 
+          TicketResponseMode.decision:
+          TicketResponseMode.permissions
       })
+
+      if (!scope) {
+        if ((response as TicketDecisionResponse).result) return true
+        throw new UnauthorizedException()
+      }
 
       const [{ scopes, rsid }] = response as TicketPermissionResponse[]
       request.scopes = scopes
