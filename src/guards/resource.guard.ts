@@ -9,20 +9,13 @@ import {
 
 import { KeycloakService } from '../service'
 import { Reflector } from '@nestjs/core'
-import {
-  META_RESOURCE_ENFORCER,
-  EnforceResourceOptions,
-} from '../decorators/resource.enforcer.decorator'
 import { META_SCOPE } from '../decorators/scope.decorator'
 import {
   TicketResponseMode,
   TicketPermissionResponse,
-  TicketDecisionResponse,
 } from '../@types/uma.ticket'
 import { META_RESOURCE } from '../decorators/resource.decorator'
-import { META_FETCH_RESOURCES } from '../decorators/fetch.resources.decorator'
 import { META_PUBLIC } from '../decorators/public.decorator'
-import { PriviledgedRequest } from '../@types/request'
 
 @Injectable()
 export class ResourceGuard implements CanActivate {
@@ -48,24 +41,14 @@ export class ResourceGuard implements CanActivate {
 
     const request = this.getRequest(context)
 
-    const resourceType = this.reflector.get<string>(META_RESOURCE, context.getClass())
+    const resource = this.reflector.get<string>(META_RESOURCE, context.getClass())
 
     // If no @DefineScope() decorator is used in handler, it's generated from http method.
     const scope =
-      this.reflector.get<string>(META_SCOPE, context.getHandler()) ||
-      this.getScopeFromRequestMethod(request)
-
-    const resourceHandler = this.reflector.get<EnforceResourceOptions>(
-      META_RESOURCE_ENFORCER,
-      context.getHandler()
-    )
-    const shouldFetchResources = this.reflector.get<boolean>(
-      META_FETCH_RESOURCES,
-      context.getHandler()
-    )
+      this.reflector.get<string>(META_SCOPE, context.getHandler())
 
     // If no resource type is defined as class decorator, emit.
-    if (!resourceType) {
+    if (!resource) {
       return true
     }
 
@@ -74,43 +57,14 @@ export class ResourceGuard implements CanActivate {
       throw new UnauthorizedException()
     }
 
-    // If handler has a @FetchResources() decorator, fetch resources for that resource type.
-    if (shouldFetchResources) {
-      return this.fetchResources(request)
-    }
-
-    let resourceId: string | undefined
-
     try {
-      if (resourceHandler) {
-        const urlParam = resourceHandler.def(request)
-        if (resourceHandler.param) {
-          const resource = await this.keycloak.resourceManager.findByAttribute(
-            resourceHandler.param,
-            urlParam
-          )
-          if (resource) {
-            resourceId = resource[0]
-          }
-        } else {
-          resourceId = urlParam
-        }
-      }
-
       const response = await this.keycloak.permissionManager.requestTicket({
         token: request.accessToken as string,
         audience: this.keycloak.options.clientId,
-        resourceId,
-        scope: scope ? `${scope}#${resourceType}` : undefined,
-        response_mode: resourceHandler
-          ? TicketResponseMode.permissions
-          : TicketResponseMode.decision,
+        resourceId: resource,
+        scope: scope ? `${scope}` : undefined,
+        response_mode: TicketResponseMode.permissions,
       })
-
-      if (!resourceHandler) {
-        if ((response as TicketDecisionResponse).result) return true
-        throw new UnauthorizedException()
-      }
 
       const [{ scopes, rsid }] = response as TicketPermissionResponse[]
       request.scopes = scopes
@@ -118,43 +72,6 @@ export class ResourceGuard implements CanActivate {
       return true
     } catch (error) {
       this.logger.error(`Uncaught exception from UMA server`, error)
-    }
-
-    throw new UnauthorizedException()
-  }
-
-  private getScopeFromRequestMethod(request: Request): string {
-    switch (request.method) {
-      case 'post':
-        return 'create'
-      case 'get':
-        return 'read'
-      case 'put':
-        return 'update'
-      case 'delete':
-        return 'delete'
-      default:
-        return 'read'
-    }
-  }
-
-  private async fetchResources(request: PriviledgedRequest) {
-    try {
-      const response = (await this.keycloak.permissionManager.requestTicket({
-        token: request.accessToken as string,
-        audience: this.keycloak.options.clientId,
-        response_mode: TicketResponseMode.permissions,
-      })) as TicketPermissionResponse[]
-
-      request.resources = await Promise.all(
-        response.map((r: TicketPermissionResponse) =>
-          this.keycloak.resourceManager.findById(r.rsid)
-        )
-      )
-
-      return true
-    } catch (error) {
-      this.logger.error(`Uncaught exception when fetching resources from UMA server`, error)
     }
 
     throw new UnauthorizedException()
