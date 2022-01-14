@@ -69,7 +69,7 @@ export class ResourceGuard implements CanActivate {
           TicketResponseMode.permissions
       })
 
-      if (!scope) {
+      if (!!scope) {
         if ((response as TicketDecisionResponse).result) return true
         throw new UnauthorizedException()
       }
