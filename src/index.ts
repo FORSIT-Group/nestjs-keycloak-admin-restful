@@ -6,10 +6,8 @@ export * from './@types/uma'
 export * from './@types/uma.ticket'
 export * from './@types/user'
 
-export * from './decorators/fetch.resources.decorator'
 export * from './decorators/public.decorator'
 export * from './decorators/resource.decorator'
-export * from './decorators/resource.enforcer.decorator'
 export * from './decorators/scope.decorator'
 
 export * from './guards/auth.guard'
