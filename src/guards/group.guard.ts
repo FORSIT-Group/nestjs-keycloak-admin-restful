@@ -1,0 +1,54 @@
+import {
+  CanActivate,
+  Injectable,
+  ExecutionContext,
+  UnauthorizedException,
+  Logger,
+  Inject,
+} from '@nestjs/common'
+
+import { KeycloakService } from '../service'
+import { Reflector } from '@nestjs/core'
+import { META_GROUPNAME } from '../decorators/groups.decorator'
+
+@Injectable()
+export class GroupGuard implements CanActivate {
+    /*
+    * Guard written to secure API calls trying to access a group, who's access
+    * is limited to group members of a group named "groupName" + "groupID",
+    * accessing the API with a query of ?groupName=groupID. If the user is not
+    * a member of that group, access is denied
+    * 
+    * The groupname is defined with the decorator @GroupName('groupName')
+    * */
+
+  logger = new Logger(GroupGuard.name)
+  
+  constructor(
+    @Inject(KeycloakService)
+    private readonly reflector: Reflector
+  ) {}
+
+  getRequest(context: ExecutionContext): any {
+    return context.switchToHttp().getRequest()
+  }
+  
+  canActivate(context: ExecutionContext): 
+    boolean | Promise<boolean> {   
+
+    const groupName = this.reflector.get<string>(META_GROUPNAME, context.getHandler())
+
+    try {
+      const request = this.getRequest(context);
+      const groups: string[] = request.user.groups.filter((group: string) => {return group.startsWith(groupName)});
+      const groupIds: number[] = groups.map((project: string) => {return parseInt(project.replace(groupName, ''))});
+
+      if (!groupIds.includes(request.query[groupName])) {
+        throw new UnauthorizedException(); 
+      }
+    } catch(error) {
+      this.logger.error(`Uncaught exception handling user info`, error)
+    }
+    return true
+  }
+}
