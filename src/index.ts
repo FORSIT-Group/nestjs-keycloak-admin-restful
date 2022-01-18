@@ -9,7 +9,7 @@ export * from './@types/user'
 export * from './decorators/public.decorator'
 export * from './decorators/resource.decorator'
 export * from './decorators/scope.decorator'
-export * from './decorators/groups.decorator'
+export * from './decorators/group.decorator'
 
 export * from './guards/auth.guard'
 export * from './guards/resource.guard'

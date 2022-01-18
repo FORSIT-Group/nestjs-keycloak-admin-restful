@@ -9,7 +9,7 @@ import {
 
 import { KeycloakService } from '../service'
 import { Reflector } from '@nestjs/core'
-import { META_GROUPNAME } from '../decorators/groups.decorator'
+import { META_GROUPNAME } from '../decorators/group.decorator'
 
 @Injectable()
 export class GroupGuard implements CanActivate {
