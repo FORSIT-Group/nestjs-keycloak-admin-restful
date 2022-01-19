@@ -4,10 +4,8 @@ import {
   ExecutionContext,
   UnauthorizedException,
   Logger,
-  Inject,
 } from '@nestjs/common'
 
-import { KeycloakService } from '../service'
 import { Reflector } from '@nestjs/core'
 import { META_GROUPNAME } from '../decorators/group.decorator'
 
@@ -25,7 +23,6 @@ export class GroupGuard implements CanActivate {
   logger = new Logger(GroupGuard.name)
   
   constructor(
-    @Inject(KeycloakService)
     private readonly reflector: Reflector
   ) {}
 
@@ -40,7 +37,6 @@ export class GroupGuard implements CanActivate {
     try {
 
       const request = this.getRequest(context);
-      this.logger.debug(request.scopes)
 
       if (meta.unlimitedScope) {
         if (request.scopes.includes(meta.unlimitedScope)) {
