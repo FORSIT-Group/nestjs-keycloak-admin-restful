@@ -3,8 +3,8 @@ import { createParamDecorator, ExecutionContext, InternalServerErrorException } 
 
 export const META_GROUPNAME = 'keycloak-groupname'
 
-export const GroupName = (groupType: string): CustomDecorator<string> =>
-  SetMetadata<string, string>(META_GROUPNAME, groupType)
+export const GroupName = (groupName: string, unlimitedScope?: string): CustomDecorator<string> =>
+  SetMetadata<string, {groupName:string, unlimitedScope?: string}>(META_GROUPNAME, {groupName: groupName, unlimitedScope: unlimitedScope} )
 
 export const UserGroups = createParamDecorator(
     /*

@@ -36,14 +36,22 @@ export class GroupGuard implements CanActivate {
   canActivate(context: ExecutionContext): 
     boolean | Promise<boolean> {   
 
-    const groupName = this.reflector.get<string>(META_GROUPNAME, context.getHandler())
-
+    const meta = this.reflector.get<{groupName: string, unlimitedScope?: string}>(META_GROUPNAME, context.getHandler())
     try {
-      const request = this.getRequest(context);
-      const groups: string[] = request.user.groups.filter((group: string) => {return group.startsWith(groupName)});
-      const groupIds: number[] = groups.map((project: string) => {return parseInt(project.replace(groupName, ''))});
 
-      if (!groupIds.includes(request.query[groupName])) {
+      const request = this.getRequest(context);
+      this.logger.debug(request.scopes)
+
+      if (meta.unlimitedScope) {
+        if (request.scopes.includes(meta.unlimitedScope)) {
+          return true
+        }
+      }
+
+      const groups: string[] = request.user.groups.filter((group: string) => {return group.startsWith(meta.groupName)});
+      const groupIds: number[] = groups.map((project: string) => {return parseInt(project.replace(meta.groupName, ''))});
+
+      if (!groupIds.includes(request.query[meta.groupName])) {
         throw new UnauthorizedException(); 
       }
     } catch(error) {
