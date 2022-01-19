@@ -43,7 +43,7 @@ export class GroupGuard implements CanActivate {
       this.logger.debug(request.scopes)
 
       if (meta.unlimitedScope) {
-        if (request.user.scopes.includes(meta.unlimitedScope)) {
+        if (request.scopes.includes(meta.unlimitedScope)) {
           return true
         }
       }

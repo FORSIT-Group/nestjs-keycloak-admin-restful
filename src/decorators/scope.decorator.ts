@@ -13,7 +13,7 @@ export const UserScopes = createParamDecorator(
     (data:any, ctx: ExecutionContext) => {
       try {
         const request = ctx.switchToHttp().getRequest();
-        const scopes: string[] = request.user.scopes
+        const scopes: string[] = request.scopes
         
         return scopes;
       } catch(error) {
