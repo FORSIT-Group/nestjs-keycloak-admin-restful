@@ -13,6 +13,7 @@ import { META_SCOPE } from '../decorators/scope.decorator'
 import {
   TicketResponseMode,
   TicketPermissionResponse,
+  TicketDeniedResponse,
   TicketDecisionResponse
 } from '../@types/uma.ticket'
 import { META_RESOURCE } from '../decorators/resource.decorator'
@@ -73,6 +74,9 @@ export class ResourceGuard implements CanActivate {
         if ((response as TicketDecisionResponse).result) return true
         throw new UnauthorizedException()
       } else {
+        if ((response as TicketDeniedResponse).error) throw new 
+          UnauthorizedException((response as TicketDeniedResponse).error)
+
         const [{ scopes, rsid }] = response as TicketPermissionResponse[]
         request.scopes = scopes
         request.resource = await this.keycloak.resourceManager.findById(rsid)

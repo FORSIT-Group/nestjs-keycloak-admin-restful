@@ -21,3 +21,7 @@ export interface TicketPermissionResponse {
   rsid: string
   rsname: string
 }
+
+export interface TicketDeniedResponse {
+  error: string
+}
