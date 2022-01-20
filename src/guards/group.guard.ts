@@ -45,8 +45,19 @@ export class GroupGuard implements CanActivate {
         }
       }
 
-      const groups: string[] = request.user.groups.filter((group: string) => {return group.startsWith(meta.groupName)});
-      const groupIds: number[] = groups.map((project: string) => {return parseInt(project.replace(meta.groupName, ''))});
+      const allGroups = request.user.groups
+
+      if (!allGroups) {
+        throw new UnauthorizedException()
+      }
+
+      const groups: string[] = allGroups.filter((group: string) => {return group.startsWith(meta.groupName)});
+
+      if (!groups) {
+        throw new UnauthorizedException()
+      }
+
+      const groupIds: number[] = groups.map((group: string) => {return parseInt(group.replace(meta.groupName, ''))});
 
       if (groupIds.includes(parseInt(request.query[meta.groupName]))) {
         return true
@@ -55,7 +66,7 @@ export class GroupGuard implements CanActivate {
       }
     } catch(error) {
       this.logger.error(`Uncaught exception handling user info`, error)
-      throw new InternalServerErrorException()
+      throw new UnauthorizedException()
     }
   }
 }
