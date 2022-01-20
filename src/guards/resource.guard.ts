@@ -72,12 +72,12 @@ export class ResourceGuard implements CanActivate {
       if (!!scope) {
         if ((response as TicketDecisionResponse).result) return true
         throw new UnauthorizedException()
+      } else {
+        const [{ scopes, rsid }] = response as TicketPermissionResponse[]
+        request.scopes = scopes
+        request.resource = await this.keycloak.resourceManager.findById(rsid)
+        return true
       }
-
-      const [{ scopes, rsid }] = response as TicketPermissionResponse[]
-      request.scopes = scopes
-      request.resource = await this.keycloak.resourceManager.findById(rsid)
-      return true
     } catch (error) {
       this.logger.error(`Uncaught exception from UMA server`, error)
     }
