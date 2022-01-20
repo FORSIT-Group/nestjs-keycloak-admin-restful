@@ -74,10 +74,16 @@ export class ResourceGuard implements CanActivate {
         if ((response as TicketDecisionResponse).result) return true;
         throw new UnauthorizedException();
       }
-      
+
       if ((response as TicketDeniedResponse).error) {
-        throw new 
-        UnauthorizedException((response as TicketDeniedResponse).error)
+        switch ((response as TicketDeniedResponse).error) {
+          case "access_denied":
+            throw new UnauthorizedException()
+          default:
+            this.logger.error("Exception from UMA server",
+             response as TicketDeniedResponse)
+            throw new UnauthorizedException((response as TicketDeniedResponse).error)
+        }
       }
 
       const [{ scopes, rsid }] = response as TicketPermissionResponse[]
