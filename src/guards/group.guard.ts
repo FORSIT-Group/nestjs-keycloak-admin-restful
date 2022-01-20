@@ -4,7 +4,6 @@ import {
   ExecutionContext,
   UnauthorizedException,
   Logger,
-  InternalServerErrorException,
 } from '@nestjs/common'
 
 import { Reflector } from '@nestjs/core'
@@ -45,21 +44,11 @@ export class GroupGuard implements CanActivate {
         }
       }
 
-      const allGroups = request.user.groups
-
-      if (!allGroups) {
-        throw new UnauthorizedException()
-      }
-
-      const groups: string[] = allGroups.filter((group: string) => {return group.startsWith(meta.groupName)});
-
-      if (!groups) {
-        throw new UnauthorizedException()
-      }
+      const groups: string[] = request.user.groups.filter((group: string) => {return group.startsWith(meta.groupName)});
 
       const groupIds: number[] = groups.map((group: string) => {return parseInt(group.replace(meta.groupName, ''))});
 
-      if (groupIds.includes(parseInt(request.query[meta.groupName]))) {
+      if (groupIds.includes(parseInt(request.query[meta.groupName + "Id"]))) {
         return true
       } else {
         throw new UnauthorizedException(); 
