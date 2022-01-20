@@ -58,7 +58,7 @@ export class GroupGuard implements CanActivate {
         throw new ForbiddenException()
       }
 
-      const groupIds: number[] = groups.map((group: string) => {return parseInt(group.replace(meta.groupName, ''))});
+      const groupIds: string[] = groups.map((group: string) => {return group.replace(meta.groupName, '')});
 
       if (groupIds.includes(request.query[meta.groupName + "Id"])) {
         return true
