@@ -24,4 +24,5 @@ export interface TicketPermissionResponse {
 
 export interface TicketDeniedResponse {
   error: string
+  error_description: string
 }
