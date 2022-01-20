@@ -4,8 +4,6 @@ import {
   ExecutionContext,
   UnauthorizedException,
   Logger,
-  InternalServerErrorException,
-  ForbiddenException,
 } from '@nestjs/common'
 
 import { Reflector } from '@nestjs/core'
@@ -49,13 +47,13 @@ export class GroupGuard implements CanActivate {
       const allGroups = request.user.groups
 
       if (!allGroups) {
-        throw new ForbiddenException()
+        return false
       }
 
       const groups: string[] = request.user.groups.filter((group: string) => {return group.startsWith(meta.groupName)});
 
       if (!groups) {
-        throw new ForbiddenException()
+        return false
       }
 
       const groupIds: string[] = groups.map((group: string) => {return group.replace(meta.groupName, '')});
@@ -63,7 +61,7 @@ export class GroupGuard implements CanActivate {
       if (groupIds.includes(request.query[meta.groupName + "Id"])) {
         return true
       } else {
-        throw new ForbiddenException(); 
+        return false
       }
     } catch(error) {
       this.logger.error(`Uncaught exception handling user info`, error)
