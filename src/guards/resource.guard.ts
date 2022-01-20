@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
   Logger,
   Inject,
+  ForbiddenException,
 } from '@nestjs/common'
 
 import { KeycloakService } from '../service'
@@ -70,20 +71,20 @@ export class ResourceGuard implements CanActivate {
           TicketResponseMode.permissions
       })
 
-      if (!!scope) {
-        if ((response as TicketDecisionResponse).result) return true;
-        throw new UnauthorizedException();
-      }
-
       if ((response as TicketDeniedResponse).error) {
         switch ((response as TicketDeniedResponse).error) {
           case "access_denied":
-            throw new UnauthorizedException()
+            throw new ForbiddenException((response as TicketDeniedResponse).error_description)
           default:
             this.logger.error("Exception from UMA server",
-             response as TicketDeniedResponse)
-            throw new UnauthorizedException((response as TicketDeniedResponse).error)
+              response as TicketDeniedResponse)
+            throw new ForbiddenException((response as TicketDeniedResponse).error)
         }
+      }
+
+      if (!!scope) {
+        if ((response as TicketDecisionResponse).result) return true;
+        throw new ForbiddenException();
       }
 
       const [{ scopes, rsid }] = response as TicketPermissionResponse[]
