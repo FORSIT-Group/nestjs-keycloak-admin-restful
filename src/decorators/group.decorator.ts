@@ -1,26 +1,19 @@
 import { SetMetadata, CustomDecorator } from '@nestjs/common'
-import { createParamDecorator, ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 
 export const META_GROUPNAME = 'keycloak-groupname'
-
-export const GroupName = (groupName: string, unlimitedScope?: string): CustomDecorator<string> =>
-  SetMetadata<string, {groupName:string, unlimitedScope?: string}>(META_GROUPNAME, {groupName: groupName, unlimitedScope: unlimitedScope} )
-
-export const UserGroups = createParamDecorator(
-    /*
-    * returns a list of the IDs of all groups starting with groupName the user is a member of
-    * */
-    (groupName:string, ctx: ExecutionContext) => {
-      try {
-        const request = ctx.switchToHttp().getRequest();
-        const groups: string[] = request.user.groups.filter((group: string) => 
-            {return group.startsWith(groupName)});
-        const groupIds: number[] = groups.map((group: string) => 
-            {return parseInt(group.replace(groupName, ''))});
-        
-        return groupIds;
-      } catch(error) {
-        throw new InternalServerErrorException()
-      };
-    }
-  );
+/**
+ * Decorator that assigns Metadata to be used by a GroupGuard.
+ * 
+ * For example: \
+ * `@GroupName('project', 'scope-unlimited')` \
+ * `@UseGuards(GroupGuard)`
+ * 
+ * @param groupName prefix that is used by all Keycloak groups
+ * @param unlimitedScope optional parameter, that defines a scope that can bypass the Groupguard
+ * @param queryName optional suffix that defines how the group is refffered to in the query.
+ * Defaults to groupName + "Id"
+ * 
+ * @fritzforsit
+ */
+export const GroupName = (groupName: string, unlimitedScope?: string, queryName?: string): CustomDecorator<string> =>
+  SetMetadata<string, {groupName:string, unlimitedScope?: string, queryName?: string}>(META_GROUPNAME, {groupName: groupName, unlimitedScope: unlimitedScope, queryName: queryName? queryName : groupName + "Id"} )

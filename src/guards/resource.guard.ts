@@ -20,7 +20,22 @@ import {
 } from '../@types/uma.ticket'
 import { META_RESOURCE } from '../decorators/resource.decorator'
 import { META_PUBLIC } from '../decorators/public.decorator'
+/**
+ * Guard that is used to protect a UMA resource. If a resource is defined
+ * with the @DefineResource decorator, the guard checks the users access to
+ * any scopes of that resource on the Keycloak.
+ * Resource name and all authorised scopes are stored in the request.
+ * 
+ * If used with a @DefineScope decorator, the guard checks access for the 
+ * given scope, and does not append to the request
+ * 
+ * 
+ * For example: \
+ * `@DefineResource('administration')` \
+ * `@UseGuards(ResourceGuard)`
 
+ * @fritzforsit
+ */
 @Injectable()
 export class ResourceGuard implements CanActivate {
   logger = new Logger(ResourceGuard.name)

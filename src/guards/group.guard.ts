@@ -8,18 +8,26 @@ import {
 
 import { Reflector } from '@nestjs/core'
 import { META_GROUPNAME } from '../decorators/group.decorator'
-
+/**
+ * Guard that is used to restrict access within a UMA resource by Keycloak 
+ * group membership. Must be run after a ResourceGuard .
+ * Use the @GroupName decorator to define the group prefix.
+ * If the @GroupName decorator is given an unlimitedScope, access to this scope
+ * bypasses the GroupGuard.
+ * The Guards expects a url query queryName(defaults to groupName + "Id")=id
+ * The Guard grants access, if the user is a member of the Keycloak group 
+ * groupName+id.
+ * 
+ * For example: \
+ * `@Get()` \
+ * `@GroupName('project','scope-unlimited)` \
+ * `@UseGuards(GroupGuard)` \
+ * `function(@Query query: any) {}`
+ * 
+ * @fritzforsit
+ */
 @Injectable()
 export class GroupGuard implements CanActivate {
-    /*
-    * Guard written to secure API calls trying to access a group, who's access
-    * is limited to group members of a group named "groupName" + "groupID",
-    * accessing the API with a query of ?groupName=groupID. If the user is not
-    * a member of that group, access is denied
-    * 
-    * The groupname is defined with the decorator @GroupName('groupName')
-    * */
-
   logger = new Logger(GroupGuard.name)
   
   constructor(
@@ -33,7 +41,7 @@ export class GroupGuard implements CanActivate {
   canActivate(context: ExecutionContext): 
     boolean | Promise<boolean> {   
 
-    const meta = this.reflector.get<{groupName: string, unlimitedScope?: string}>(META_GROUPNAME, context.getHandler())
+    const meta = this.reflector.get<{groupName: string, unlimitedScope?: string, idSuffix: string}>(META_GROUPNAME, context.getHandler())
     try {
 
       const request = this.getRequest(context);
