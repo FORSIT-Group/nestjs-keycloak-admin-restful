@@ -10,7 +10,6 @@ export * from './decorators/public.decorator'
 export * from './decorators/resource.decorator'
 export * from './decorators/scope.decorator'
 export * from './decorators/group.decorator'
-export * from './decorators/user.decorator'
 
 export * from './guards/auth.guard'
 export * from './guards/resource.guard'
@@ -21,6 +20,7 @@ export * from './lib/resource-manager'
 export * from './lib/permission-manager'
 
 export * from './param-decorators/access-token.decorator'
+export * from './param-decorators/user.decorator'
 
 export * from './uma/resource'
 export * from './uma/scope'
