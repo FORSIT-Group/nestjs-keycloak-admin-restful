@@ -5,8 +5,8 @@ import { ResourceManager } from './lib/resource-manager'
 import { PermissionManager } from './lib/permission-manager'
 import { KeycloakModuleOptions } from './@types/package'
 import KeycloakConnect, { Keycloak } from 'keycloak-connect'
-import { RequestManager } from './lib/request-manager'
 import { UMAConfiguration } from './@types/uma'
+import Axios from 'axios'
 
 @Global()
 export class KeycloakService {
@@ -16,7 +16,7 @@ export class KeycloakService {
   private issuerClient?: Client
 
   private baseUrl: string
-  private requestManager: RequestManager
+
   public umaConfiguration?: UMAConfiguration
   public readonly options: KeycloakModuleOptions
 
@@ -50,17 +50,22 @@ export class KeycloakService {
       realmName: this.options.realmName,
     })
 
-    this.requestManager = new RequestManager(this, this.baseUrl)
   }
 
   async initialize(): Promise<void> {
     if (this.umaConfiguration) {
       return
     }
-    const { clientId, clientSecret } = this.options
-    const { data } = await this.requestManager.get<UMAConfiguration>(
+
+    const baseURL = this.baseUrl
+    const umaRequester = Axios.create({ baseURL })
+
+    const { data } = await umaRequester.get<UMAConfiguration>(
       '/.well-known/uma2-configuration'
     )
+
+    const { clientId, clientSecret } = this.options
+
     this.umaConfiguration = data
 
     this.resourceManager = new ResourceManager(this, data.resource_registration_endpoint)
