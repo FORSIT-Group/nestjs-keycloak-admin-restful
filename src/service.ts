@@ -57,14 +57,14 @@ export class KeycloakService {
       return
     }
 
-    const baseURL = this.baseUrl
-    const umaRequester = Axios.create({ baseURL })
+    const umaConfigurationRequester = Axios.create({ baseURL: this.baseUrl })
 
-    const { data } = await umaRequester.get<UMAConfiguration>(
+    const { data } = await umaConfigurationRequester.get<UMAConfiguration>(
       '/.well-known/uma2-configuration'
     )
-
-    const { clientId, clientSecret } = this.options
+    if (!data) {
+      throw new Error(`Failed fetching uma configuration.`)
+    }
 
     this.umaConfiguration = data
 
@@ -72,6 +72,8 @@ export class KeycloakService {
     this.permissionManager = new PermissionManager(this, data.token_endpoint)
 
     const keycloakIssuer = await Issuer.discover(data.issuer)
+
+    const { clientId, clientSecret } = this.options
 
     this.issuerClient = new keycloakIssuer.Client({
       client_id: clientId,
