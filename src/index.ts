@@ -21,7 +21,6 @@ export * from './lib/resource-manager'
 export * from './lib/permission-manager'
 
 export * from './param-decorators/access-token.decorator'
-export * from './param-decorators/user.decorator'
 
 export * from './uma/resource'
 export * from './uma/scope'
