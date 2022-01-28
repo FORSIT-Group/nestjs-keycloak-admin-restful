@@ -97,25 +97,29 @@ export class KeycloakService {
       return null
     }
 
-    const { refresh_token } = this.tokenSet
+    // try fetching refreshToken for ClientCredentialGrant - not recommended!!
+    if (!!this.options.useRefreshToken) {
 
-    if (!refresh_token) {
+      const { refresh_token } = this.tokenSet
+
+      if (!!refresh_token) {
+        this.logger.debug(`Refreshing grant token`)
+        this.tokenSet = await this.issuerClient?.refresh(refresh_token)
+        return this.tokenSet
+      }
       this.logger.debug(`Refresh token is missing. Reauthenticating.`)
-
-      this.tokenSet = await this.issuerClient?.grant({
-        clientId: this.options.clientId,
-        clientSecret: this.options.clientSecret,
-        grant_type: 'client_credentials',
-      })
-      if (this.tokenSet?.access_token) this.client.setAccessToken(this.tokenSet?.access_token)
-      
-      return this.tokenSet
     }
 
-    this.logger.debug(`Refreshing grant token`)
+    this.tokenSet = await this.issuerClient?.grant({
+      clientId: this.options.clientId,
+      clientSecret: this.options.clientSecret,
+      grant_type: 'client_credentials',
+    })
 
-    this.tokenSet = await this.issuerClient?.refresh(refresh_token)
-
-    return this.tokenSet
+    if (this.tokenSet?.access_token) {
+      this.client.setAccessToken(this.tokenSet?.access_token)
+      return this.tokenSet
+    }
+    this.logger.error(`Failed on refreshGrant.`)
   }
 }

@@ -14,4 +14,5 @@ export interface KeycloakModuleOptions {
   realmName: string
   clientId: string
   clientSecret: string
+  useRefreshToken?: boolean
 }

@@ -11,8 +11,8 @@ import { META_GROUPNAME } from '../decorators/group.decorator'
 /**
  * Guard that is used to restrict access within a UMA resource by Keycloak 
  * group membership. Must be run after a ResourceGuard .
- * Use the @GroupName decorator to define the group prefix.
- * If the @GroupName decorator is given an unlimitedScope, access to this scope
+ * Use the @DefineGroup decorator to define the group prefix.
+ * If the @DefineGroup decorator is given an unlimitedScope, access to this scope
  * bypasses the GroupGuard.
  * The Guards expects a url query queryName(defaults to groupName + "Id")=id
  * The Guard grants access, if the user is a member of the Keycloak group 
@@ -20,7 +20,7 @@ import { META_GROUPNAME } from '../decorators/group.decorator'
  * 
  * For example: \
  * `@Get()` \
- * `@GroupName('project','scope-unlimited)` \
+ * `@DefineGroup('project','scope-unlimited)` \
  * `@UseGuards(GroupGuard)` \
  * `function(@Query query: any) {}`
  * 

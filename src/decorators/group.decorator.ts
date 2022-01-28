@@ -5,7 +5,7 @@ export const META_GROUPNAME = 'keycloak-groupname'
  * Decorator that assigns Metadata to be used by a GroupGuard.
  * 
  * For example: \
- * `@GroupName('project', 'scope-unlimited')` \
+ * `@DefineGroup('project', 'scope-unlimited')` \
  * `@UseGuards(GroupGuard)`
  * 
  * @param groupName prefix that is used by all Keycloak groups
@@ -15,5 +15,5 @@ export const META_GROUPNAME = 'keycloak-groupname'
  * 
  * @fritzforsit
  */
-export const GroupName = (groupName: string, unlimitedScope?: string, queryName?: string): CustomDecorator<string> =>
+export const DefineGroup = (groupName: string, unlimitedScope?: string, queryName?: string): CustomDecorator<string> =>
   SetMetadata<string, {groupName:string, unlimitedScope?: string, queryName?: string}>(META_GROUPNAME, {groupName: groupName, unlimitedScope: unlimitedScope, queryName: queryName? queryName : groupName + "Id"} )

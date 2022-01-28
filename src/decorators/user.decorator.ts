@@ -51,6 +51,30 @@ export const UserScopes = createParamDecorator(
     };
   }
 );
+
+/**
+ * Parameter Decorator that is used retrieve the current users Keycloak Roles.
+ * 
+ * For example:
+ * `function(@UserRoles() userRoles: string[])`
+ * 
+ * @returns string[]: the users Keycloak roles
+ *
+ * @fritzforsit
+ */
+export const UserRoles = createParamDecorator(
+  (data:any, ctx: ExecutionContext) => {
+    try {
+      const request = ctx.switchToHttp().getRequest();
+      const roles: string[] = request.user.roles
+      
+      return roles;
+    } catch(error) {
+      throw new InternalServerErrorException("Error fetching user scopes")
+    };
+  }
+);
+
 /**
  * Parameter Decorator that is used retrieve the current users Keycloak id.
  * 
@@ -65,7 +89,7 @@ export const UserId = createParamDecorator(
   (data:any, ctx: ExecutionContext) => {
     try {
       const request = ctx.switchToHttp().getRequest();
-      const id: string[] = request.user.id
+      const id: string[] = request.user.sub
       
       return id;
     } catch(error) {
