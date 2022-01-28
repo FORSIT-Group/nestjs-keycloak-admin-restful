@@ -5,8 +5,6 @@ import {
   UnauthorizedException,
   Logger,
   Inject,
-  ForbiddenException,
-  InternalServerErrorException,
 } from '@nestjs/common'
 
 import { KeycloakService } from '../service'
