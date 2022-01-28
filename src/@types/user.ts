@@ -6,4 +6,6 @@ export interface KeycloakUser {
   given_name: string
   family_name: string
   email: string
+  groups: string[]
+  resource_access: JSON
 }

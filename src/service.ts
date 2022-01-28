@@ -1,13 +1,12 @@
 import { Logger, Global } from '@nestjs/common'
-import AdminClient from 'keycloak-admin'
+import AdminClient from '@keycloak/keycloak-admin-client'
 import { Client, Issuer, TokenSet } from 'openid-client'
-import { resolve } from 'url'
 import { ResourceManager } from './lib/resource-manager'
 import { PermissionManager } from './lib/permission-manager'
 import { KeycloakModuleOptions } from './@types/package'
 import KeycloakConnect, { Keycloak } from 'keycloak-connect'
-import { RequestManager } from './lib/request-manager'
 import { UMAConfiguration } from './@types/uma'
+import Axios from 'axios'
 
 @Global()
 export class KeycloakService {
@@ -17,7 +16,7 @@ export class KeycloakService {
   private issuerClient?: Client
 
   private baseUrl: string
-  private requestManager: RequestManager
+
   public umaConfiguration?: UMAConfiguration
   public readonly options: KeycloakModuleOptions
 
@@ -31,12 +30,12 @@ export class KeycloakService {
       throw new Error(`Invalid base url. It should start with either http or https.`)
     }
     this.options = options
-    this.baseUrl = resolve(options.baseUrl, `/auth/realms/${options.realmName}`)
+    this.baseUrl = new URL(`/auth/realms/${options.realmName}`, options.baseUrl).href
 
     const keycloak: any = new KeycloakConnect({}, {
       resource: this.options.clientId,
       realm: this.options.realmName,
-      'auth-server-url': resolve(this.options.baseUrl, '/auth'),
+      'auth-server-url': new URL('/auth', this.options.baseUrl).href,
       secret: this.options.clientSecret,
     } as any)
 
@@ -51,23 +50,30 @@ export class KeycloakService {
       realmName: this.options.realmName,
     })
 
-    this.requestManager = new RequestManager(this, this.baseUrl)
   }
 
   async initialize(): Promise<void> {
     if (this.umaConfiguration) {
       return
     }
-    const { clientId, clientSecret } = this.options
-    const { data } = await this.requestManager.get<UMAConfiguration>(
+
+    const umaConfigurationRequester = Axios.create({ baseURL: this.baseUrl })
+
+    const { data } = await umaConfigurationRequester.get<UMAConfiguration>(
       '/.well-known/uma2-configuration'
     )
+    if (!data) {
+      throw new Error(`Failed fetching uma configuration.`)
+    }
+
     this.umaConfiguration = data
 
     this.resourceManager = new ResourceManager(this, data.resource_registration_endpoint)
     this.permissionManager = new PermissionManager(this, data.token_endpoint)
 
     const keycloakIssuer = await Issuer.discover(data.issuer)
+
+    const { clientId, clientSecret } = this.options
 
     this.issuerClient = new keycloakIssuer.Client({
       client_id: clientId,
@@ -97,25 +103,29 @@ export class KeycloakService {
       return null
     }
 
-    const { refresh_token } = this.tokenSet
+    // try fetching refreshToken for ClientCredentialGrant - not recommended!!
+    if (!!this.options.useRefreshToken) {
 
-    if (!refresh_token) {
+      const { refresh_token } = this.tokenSet
+
+      if (!!refresh_token) {
+        this.logger.debug(`Refreshing grant token`)
+        this.tokenSet = await this.issuerClient?.refresh(refresh_token)
+        return this.tokenSet
+      }
       this.logger.debug(`Refresh token is missing. Reauthenticating.`)
-
-      this.tokenSet = await this.issuerClient?.grant({
-        clientId: this.options.clientId,
-        clientSecret: this.options.clientSecret,
-        grant_type: 'client_credentials',
-      })
-      if (this.tokenSet?.access_token) this.client.setAccessToken(this.tokenSet?.access_token)
-      
-      return this.tokenSet
     }
 
-    this.logger.debug(`Refreshing grant token`)
+    this.tokenSet = await this.issuerClient?.grant({
+      clientId: this.options.clientId,
+      clientSecret: this.options.clientSecret,
+      grant_type: 'client_credentials',
+    })
 
-    this.tokenSet = await this.issuerClient?.refresh(refresh_token)
-
-    return this.tokenSet
+    if (this.tokenSet?.access_token) {
+      this.client.setAccessToken(this.tokenSet?.access_token)
+      return this.tokenSet
+    }
+    this.logger.error(`Failed on refreshGrant.`)
   }
 }

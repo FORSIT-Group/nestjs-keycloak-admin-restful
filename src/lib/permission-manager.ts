@@ -1,7 +1,6 @@
 import { KeycloakService } from '../service'
 import { RequestManager } from './request-manager'
-import { TicketForm, TicketDecisionResponse, TicketPermissionResponse } from '../@types/uma.ticket'
-import qs from 'querystring'
+import { TicketForm, TicketDecisionResponse, TicketDeniedResponse, TicketPermissionResponse } from '../@types/uma.ticket'
 
 export class PermissionManager {
   private readonly requestManager: RequestManager
@@ -12,7 +11,7 @@ export class PermissionManager {
 
   async requestTicket(
     ticket: TicketForm
-  ): Promise<TicketDecisionResponse | TicketPermissionResponse[]> {
+  ): Promise<TicketDecisionResponse | TicketDeniedResponse | TicketPermissionResponse[]> {
     if (!ticket.grant_type) {
       ticket.grant_type = 'urn:ietf:params:oauth:grant-type:uma-ticket'
     }
@@ -22,15 +21,14 @@ export class PermissionManager {
     params.append('audience', ticket.audience)
     params.append('response_mode', ticket.response_mode || 'decision')
 
-    const permission =
-      ticket.resourceId && ticket.scope ? `${ticket.resourceId}#${ticket.scope}` : null
-
-    if (permission) {
+    if (ticket.resourceId) {
+      const permission =
+        ticket.scope ? `${ticket.resourceId}#${ticket.scope}` : `${ticket.resourceId}`
       params.append('permission', permission)
     }
 
     const { data } = await this.requestManager.post<
-      TicketDecisionResponse | TicketPermissionResponse[]
+      TicketDecisionResponse | TicketDeniedResponse | TicketPermissionResponse[]
     >(`/`, params, {
       headers: {
         authorization: `Bearer ${ticket.token}`,

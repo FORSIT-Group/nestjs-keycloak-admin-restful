@@ -6,14 +6,15 @@ export * from './@types/uma'
 export * from './@types/uma.ticket'
 export * from './@types/user'
 
-export * from './decorators/fetch.resources.decorator'
 export * from './decorators/public.decorator'
 export * from './decorators/resource.decorator'
-export * from './decorators/resource.enforcer.decorator'
 export * from './decorators/scope.decorator'
+export * from './decorators/group.decorator'
+export * from './decorators/user.decorator'
 
 export * from './guards/auth.guard'
 export * from './guards/resource.guard'
+export * from './guards/group.guard'
 
 export * from './lib/request-manager'
 export * from './lib/resource-manager'
