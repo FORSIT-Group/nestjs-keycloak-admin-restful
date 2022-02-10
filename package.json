@@ -35,9 +35,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/anonrig/nestjs-keycloak-admin"
+    "url": "https://github.com/fritzforsit/nestjs-keycloak-admin"
   },
-  "bugs": "https://github.com/anonrig/nestjs-keycloak-admin",
+  "bugs": "https://github.com/fritzforsit/nestjs-keycloak-admin",
   "peerDependencies": {
     "@nestjs/common": "^8.1.1",
     "@nestjs/core": "^8.1.1",
@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "axios": "^0.23.0",
-    "@keycloak/keycloak-admin-client": "^16.1.0",
+    "@keycloak/keycloak-admin-client": "https://github.com/fritzforsit/keycloak-nodejs-admin-client#canri-stable",
     "keycloak-connect": "^15.0.2",
     "openid-client": "^4.9.1"
   },
