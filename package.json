@@ -45,8 +45,8 @@
     "rxjs": "^7.4.0"
   },
   "dependencies": {
+    "@keycloak/keycloak-admin-client": "github:fritzforsit/keycloak-nodejs-admin-client#canri",
     "axios": "^0.23.0",
-    "@keycloak/keycloak-admin-client": "https://github.com/fritzforsit/keycloak-nodejs-admin-client#canri-stable",
     "keycloak-connect": "^15.0.2",
     "openid-client": "^4.9.1"
   },
@@ -59,7 +59,7 @@
     "@types/node": "16.11.0",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
-    "cz-conventional-changelog": "3.3.0",
+    "cz-conventional-changelog": "^3.0.1",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.3.0",
     "husky": "^7.0.2",
