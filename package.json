@@ -24,7 +24,7 @@
     "prepare": "npm run snyk-protect && npm run build",
     "format": "prettier --write \"src/**/*.ts\"",
     "snyk-protect": "snyk protect",
-    "release": "semantic-release"
+    "release": "npx semantic-release"
   },
   "keywords": [
     "nestjs"
