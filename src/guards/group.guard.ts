@@ -14,7 +14,7 @@ import { META_GROUPNAME } from '../decorators/group.decorator'
  * Use the @DefineGroup decorator to define the group prefix.
  * If the @DefineGroup decorator is given an unlimitedScope, access to this scope
  * bypasses the GroupGuard.
- * The Guards expects a url query queryName(defaults to groupName + "Id")=id
+ * The Guards expects a url param paramName(defaults to groupName + "Id")=id
  * The Guard grants access, if the user is a member of the Keycloak group 
  * groupName+id.
  * 
@@ -22,7 +22,7 @@ import { META_GROUPNAME } from '../decorators/group.decorator'
  * `@Get()` \
  * `@DefineGroup('project','scope-unlimited)` \
  * `@UseGuards(GroupGuard)` \
- * `function(@Query query: any) {}`
+ * `function(@Param param: any) {}`
  * 
  * @fritzforsit
  */
@@ -66,7 +66,7 @@ export class GroupGuard implements CanActivate {
 
       const groupIds: string[] = groups.map((group: string) => {return group.replace(meta.groupName, '')});
 
-      if (groupIds.includes(request.query[meta.groupName + "Id"])) {
+      if (groupIds.includes(request.param[meta.groupName + "Id"])) {
         return true
       } else {
         return false
