@@ -48,7 +48,7 @@ export class GroupGuard implements CanActivate {
       const request = this.getRequest(context);
 
       if (meta.unlimitedSuffix) {
-        let unlimitedScopeName = `${meta.scopeType}-${meta.unlimitedSuffix}`
+        let unlimitedScopeName = `${CRUD[meta.scopeType]}-${meta.unlimitedSuffix}`
         if (request.scopes.includes(unlimitedScopeName)) {
           return true
         }
