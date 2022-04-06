@@ -18,6 +18,7 @@ import {
 } from '../@types/uma.ticket'
 import { META_RESOURCE } from '../decorators/resource.decorator'
 import { META_PUBLIC } from '../decorators/public.decorator'
+import { CRUD } from '../@types/scope'
 /**
  * Guard that is used to protect a UMA resource. If a resource is defined
  * with the @DefineResource decorator, the guard checks the users access to
@@ -61,8 +62,14 @@ export class ResourceGuard implements CanActivate {
     const resource = this.reflector.get<string>(META_RESOURCE, context.getClass())
 
     // If no @DefineScope() decorator is used in handler, it's generated from http method.
-    const scope =
-      this.reflector.get<string>(META_SCOPE, context.getHandler())
+    const scopeData =
+      this.reflector.get<{scopeType: CRUD, scopeName: string}>(META_SCOPE, context.getHandler())
+
+    let scope = undefined
+
+    if (scopeData.scopeType && scopeData.scopeName) {
+        scope = `${scopeData.scopeType}-${scopeData.scopeName}`
+    }
 
     // If no resource type is defined as class decorator, emit.
     if (!resource) {
@@ -104,8 +111,19 @@ export class ResourceGuard implements CanActivate {
       const [{ scopes, rsid }] = response as TicketPermissionResponse[]
       request.scopes = scopes
       request.resource = await this.keycloak.resourceManager.findById(rsid)
-      return true
-      
+
+      // check for ownership of any scopes with specific CRUD type
+
+      if (!scopeData.scopeType) {
+        return true
+      }
+
+      if (scopes.find((scopeName) => {
+        return scopeName.startsWith(CRUD[scopeData.scopeType])
+      })) {
+        return true
+      }   
+         
     } catch (error) {
       this.logger.error(`Uncaught exception from UMA server`, error)
     }
