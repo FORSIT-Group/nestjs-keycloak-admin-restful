@@ -7,12 +7,13 @@ import {
 } from '@nestjs/common'
 
 import { Reflector } from '@nestjs/core'
+import { CRUD } from '../@types/scope'
 import { META_GROUPNAME } from '../decorators/group.decorator'
 /**
  * Guard that is used to restrict access within a UMA resource by Keycloak 
  * group membership. Must be run after a ResourceGuard .
  * Use the @DefineGroup decorator to define the group prefix.
- * If the @DefineGroup decorator is given an unlimitedScope, access to this scope
+ * If the @DefineGroup decorator is given an unlimitedScopeSuffix, access to this scope
  * bypasses the GroupGuard.
  * The Guards expects a url param paramName(defaults to groupName + "Id")=id
  * The Guard grants access, if the user is a member of the Keycloak group 
@@ -20,7 +21,7 @@ import { META_GROUPNAME } from '../decorators/group.decorator'
  * 
  * For example: \
  * `@Get()` \
- * `@DefineGroup('project','scope-unlimited)` \
+ * `@DefineGroup('project','create','unlimited')` \
  * `@UseGuards(GroupGuard)` \
  * `function(@Param param: any) {}`
  * 
@@ -41,36 +42,42 @@ export class GroupGuard implements CanActivate {
   canActivate(context: ExecutionContext): 
     boolean | Promise<boolean> {   
 
-    const meta = this.reflector.get<{groupName: string, unlimitedScope?: string, idSuffix: string}>(META_GROUPNAME, context.getHandler())
+    const meta = this.reflector.get<{scopeType: CRUD, groupName: string, unlimitedSuffix?: string, paramName: string}>(META_GROUPNAME, context.getHandler())
     try {
 
       const request = this.getRequest(context);
 
-      if (meta.unlimitedScope) {
-        if (request.scopes.includes(meta.unlimitedScope)) {
+      if (meta.unlimitedSuffix) {
+        let unlimitedScopeName = `${meta.scopeType}-${meta.unlimitedSuffix}`
+        if (request.scopes.includes(unlimitedScopeName)) {
           return true
         }
       }
 
-      const allGroups = request.user.groups
+      let limitedScopeName = `${meta.scopeType}-${meta.groupName}-limited`
 
-      if (!allGroups) {
-        return false
+      if (request.scopes.includes(limitedScopeName)) {
+
+        const allGroups = request.user.groups
+
+        if (!allGroups) {
+          return false
+        }
+
+        const groups: string[] = request.user.groups.filter((group: string) => {return group.startsWith(meta.groupName)});
+
+        if (!groups) {
+          return false
+        }
+
+        const groupIds: string[] = groups.map((group: string) => {return group.replace(meta.groupName, '')});
+
+        if (groupIds.includes(request.param[meta.paramName])) {
+          return true
+        }
       }
+      return false
 
-      const groups: string[] = request.user.groups.filter((group: string) => {return group.startsWith(meta.groupName)});
-
-      if (!groups) {
-        return false
-      }
-
-      const groupIds: string[] = groups.map((group: string) => {return group.replace(meta.groupName, '')});
-
-      if (groupIds.includes(request.param[meta.groupName + "Id"])) {
-        return true
-      } else {
-        return false
-      }
     } catch(error) {
       this.logger.error(`Uncaught exception handling user info`, error)
       throw new UnauthorizedException()
