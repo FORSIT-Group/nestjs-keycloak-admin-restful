@@ -69,7 +69,7 @@ export class ResourceGuard implements CanActivate {
 
     if (scopeData) {
       if (scopeData.scopeType && scopeData.scopeName) {
-          scope = `${scopeData.scopeType}-${scopeData.scopeName}`
+          scope = `${CRUD[scopeData.scopeType]}-${scopeData.scopeName}`
       }
     }
 
