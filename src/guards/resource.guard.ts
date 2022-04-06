@@ -67,8 +67,10 @@ export class ResourceGuard implements CanActivate {
 
     let scope = undefined
 
-    if (scopeData.scopeType && scopeData.scopeName) {
-        scope = `${scopeData.scopeType}-${scopeData.scopeName}`
+    if (scopeData) {
+      if (scopeData.scopeType && scopeData.scopeName) {
+          scope = `${scopeData.scopeType}-${scopeData.scopeName}`
+      }
     }
 
     // If no resource type is defined as class decorator, emit.
@@ -114,7 +116,7 @@ export class ResourceGuard implements CanActivate {
 
       // check for ownership of any scopes with specific CRUD type
 
-      if (!scopeData.scopeType) {
+      if (!scopeData) {
         return true
       }
 
@@ -123,7 +125,7 @@ export class ResourceGuard implements CanActivate {
       })) {
         return true
       }   
-         
+
     } catch (error) {
       this.logger.error(`Uncaught exception from UMA server`, error)
     }
