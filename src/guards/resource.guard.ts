@@ -22,12 +22,11 @@ import { CRUD } from '../@types/scope'
 /**
  * Guard that is used to protect a UMA resource. If a resource is defined
  * with the @DefineResource decorator, the guard checks the users access to
- * any scopes of that resource on the Keycloak.
+ * any scopes of that resource on Keycloak.
  * Resource name and all authorised scopes are stored in the request.
  * 
  * If used with a @DefineScope decorator, the guard checks access for the 
- * given scope, and does not append to the request
- * 
+ * given scope and does not append to the request.
  * 
  * For example: \
  * `@DefineResource('administration')` \

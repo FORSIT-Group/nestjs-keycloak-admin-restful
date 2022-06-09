@@ -6,13 +6,13 @@ export const META_GROUPNAME = 'keycloak-groupname'
  * Decorator that assigns Metadata to be used by a GroupGuard.
  * 
  * For example: \
- * `@DefineGroup('read', 'project', 'unlimited')` \
+ * `@DefineGroup('read', 'project', 'unlimited', 'projectId')` \
  * `@UseGuards(GroupGuard)`
  * 
- * @param scope CRUD operation
- * @param groupName prefix that is used by all Keycloak groups
- * @param unlimitedScope optional parameter, that defines a scope that can bypass the Groupguard
- * @param paramName optional suffix that defines how the group is refffered to in the url param.
+ * @param scopeType CRUD operation.
+ * @param groupName Prefix that is used by all Keycloak groups.
+ * @param unlimitedSuffix Optional parameter, that defines a scope, that can bypass the GroupGuard.
+ * @param paramName Optional suffix that defines to which URL parameter the group is referred to.
  * Defaults to groupName + "Id"
  * 
  * @fritzforsit

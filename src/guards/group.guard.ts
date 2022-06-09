@@ -11,13 +11,13 @@ import { CRUD } from '../@types/scope'
 import { META_GROUPNAME } from '../decorators/group.decorator'
 /**
  * Guard that is used to restrict access within a UMA resource by Keycloak 
- * group membership. Must be run after a ResourceGuard .
+ * group membership. Must be run after a ResourceGuard.
  * Use the @DefineGroup decorator to define the group prefix.
  * If the @DefineGroup decorator is given an unlimitedScopeSuffix, access to this scope
  * bypasses the GroupGuard.
- * The Guards expects a url param paramName(defaults to groupName + "Id")=id
- * The Guard grants access, if the user is a member of the Keycloak group 
- * groupName+id.
+ * The Guards expects a url param paramName. This defaults to groupName + "Id", for example,
+ * if groupName is project, the default value for paramName is projectId.
+ * The Guard grants access, if the user is a member of the Keycloak group.
  * 
  * For example: \
  * `@Get()` \

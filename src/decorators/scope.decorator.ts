@@ -6,14 +6,13 @@ export const META_SCOPE = 'keycloak-scope'
  * Decorator that assigns Metadata to be used by a ResourceGuard.
  * Must used in combination with the @DefineResource decorator.
  * Limits access to Users who own the supplied scope.
- * A 
  * 
  * For example: \
  * `@DefineResource('administration')` \
  * `@DefineScope(CRUD.read)`
  * 
  * @param scopeType CRUD type of the Keycloak resource scope.
- * @param scopeName optional argument, if supplied ownership of a specific scope is checked
+ * @param scopeName Optional argument for checking supplied ownership of a specific scope.
  *
  * @fritzforsit
  */

@@ -3,7 +3,7 @@ import { SetMetadata, CustomDecorator } from '@nestjs/common'
 export const META_RESOURCE = 'keycloak-resource'
 /**
  * Decorator that assigns Metadata to be used by a ResourceGuard.
- * Can be used in combination with the @DefineScope decorator
+ * Can be used in combination with the @DefineScope decorator.
  * 
  * For example: \
  * `@DefineResource('project-management')`
