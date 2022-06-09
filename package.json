@@ -1,6 +1,6 @@
 {
-  "name": "nestjs-keycloak-admin",
-  "version": "1.6.7",
+  "name": "nestjs-keycloak-admin-restful",
+  "version": "1.0.0",
   "description": "Keycloak Admin Provider for Nest.js",
   "author": "Yagiz Nizipli <yagiz@nizipli.com>",
   "license": "MIT",
@@ -35,9 +35,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/fritzforsit/nestjs-keycloak-admin"
+    "url": "https://github.com/FORSIT-Group/nestjs-keycloak-admin-restful"
   },
-  "bugs": "https://github.com/fritzforsit/nestjs-keycloak-admin",
+  "bugs": "https://github.com/FORSIT-Group/nestjs-keycloak-admin-restful",
   "peerDependencies": {
     "@nestjs/common": "^8.1.1",
     "@nestjs/core": "^8.1.1",
