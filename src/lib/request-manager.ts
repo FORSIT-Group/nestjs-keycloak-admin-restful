@@ -25,13 +25,16 @@ export class RequestManager {
         this.logger.warn(`Could not refresh grant on interceptor.`, error)
       }
       return config
-    });
+    })
     this.requester.interceptors.response.use(
-      response => { return response; }, 
-      error => { return error.response; }
-    );
+      (response) => {
+        return response
+      },
+      (error) => {
+        return error.response
+      }
+    )
   }
-  
 
   async get<T>(...args: [string, (AxiosRequestConfig | undefined)?]): Promise<AxiosResponse<T>> {
     return this.requester.get.apply<any, any, Promise<AxiosResponse<T>>>(null, args)

@@ -14,7 +14,7 @@ import {
   TicketResponseMode,
   TicketPermissionResponse,
   TicketDeniedResponse,
-  TicketDecisionResponse
+  TicketDecisionResponse,
 } from '../@types/uma.ticket'
 import { META_RESOURCE } from '../decorators/resource.decorator'
 import { META_PUBLIC } from '../decorators/public.decorator'
@@ -61,14 +61,16 @@ export class ResourceGuard implements CanActivate {
     const resource = this.reflector.get<string>(META_RESOURCE, context.getClass())
 
     // If no @DefineScope() decorator is used in handler, it's generated from http method.
-    const scopeData =
-      this.reflector.get<{scopeType: CRUD, scopeName: string}>(META_SCOPE, context.getHandler())
+    const scopeData = this.reflector.get<{ scopeType: CRUD; scopeName: string }>(
+      META_SCOPE,
+      context.getHandler()
+    )
 
     let scope = undefined
 
     if (scopeData) {
       if (scopeData.scopeType && scopeData.scopeName) {
-          scope = `${CRUD[scopeData.scopeType]}-${scopeData.scopeName}`
+        scope = `${CRUD[scopeData.scopeType]}-${scopeData.scopeName}`
       }
     }
 
@@ -88,25 +90,22 @@ export class ResourceGuard implements CanActivate {
         audience: this.keycloak.options.clientId,
         resourceId: resource,
         scope: scope ? `${scope}` : undefined,
-        response_mode: scope? 
-          TicketResponseMode.decision:
-          TicketResponseMode.permissions
+        response_mode: scope ? TicketResponseMode.decision : TicketResponseMode.permissions,
       })
 
       if ((response as TicketDeniedResponse).error) {
         switch ((response as TicketDeniedResponse).error) {
-          case "access_denied":
+          case 'access_denied':
             return false
           default:
-            this.logger.error("Exception from UMA server",
-              response as TicketDeniedResponse)
-            return false            
+            this.logger.error('Exception from UMA server', response as TicketDeniedResponse)
+            return false
         }
       }
 
       if (!!scope) {
-        if ((response as TicketDecisionResponse).result) return true;
-        return false;
+        if ((response as TicketDecisionResponse).result) return true
+        return false
       }
 
       const [{ scopes, rsid }] = response as TicketPermissionResponse[]
@@ -119,12 +118,13 @@ export class ResourceGuard implements CanActivate {
         return true
       }
 
-      if (scopes.find((scopeName) => {
-        return scopeName.startsWith(CRUD[scopeData.scopeType])
-      })) {
+      if (
+        scopes.find((scopeName) => {
+          return scopeName.startsWith(CRUD[scopeData.scopeType])
+        })
+      ) {
         return true
-      }   
-
+      }
     } catch (error) {
       this.logger.error(`Uncaught exception from UMA server`, error)
     }

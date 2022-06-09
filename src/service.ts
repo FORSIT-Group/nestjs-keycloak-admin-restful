@@ -49,7 +49,6 @@ export class KeycloakService {
       baseUrl: this.options.baseUrl,
       realmName: this.options.realmName,
     })
-
   }
 
   async initialize(): Promise<void> {
@@ -105,7 +104,6 @@ export class KeycloakService {
 
     // try fetching refreshToken for ClientCredentialGrant - not recommended!!
     if (!!this.options.useRefreshToken) {
-
       const { refresh_token } = this.tokenSet
 
       if (!!refresh_token) {

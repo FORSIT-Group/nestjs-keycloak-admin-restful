@@ -1,6 +1,11 @@
 import { KeycloakService } from '../service'
 import { RequestManager } from './request-manager'
-import { TicketForm, TicketDecisionResponse, TicketDeniedResponse, TicketPermissionResponse } from '../@types/uma.ticket'
+import {
+  TicketForm,
+  TicketDecisionResponse,
+  TicketDeniedResponse,
+  TicketPermissionResponse,
+} from '../@types/uma.ticket'
 
 export class PermissionManager {
   private readonly requestManager: RequestManager
@@ -22,8 +27,9 @@ export class PermissionManager {
     params.append('response_mode', ticket.response_mode || 'decision')
 
     if (ticket.resourceId) {
-      const permission =
-        ticket.scope ? `${ticket.resourceId}#${ticket.scope}` : `${ticket.resourceId}`
+      const permission = ticket.scope
+        ? `${ticket.resourceId}#${ticket.scope}`
+        : `${ticket.resourceId}`
       params.append('permission', permission)
     }
 

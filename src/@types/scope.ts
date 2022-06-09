@@ -1,6 +1,6 @@
 export enum CRUD {
-    'create',
-    'read',
-    'update',
-    'delete'
-};
+  'create',
+  'read',
+  'update',
+  'delete',
+}
