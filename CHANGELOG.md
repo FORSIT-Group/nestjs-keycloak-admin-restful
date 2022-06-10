@@ -1,3 +1,13 @@
+# [1.1.0](https://github.com/FORSIT-Group/nestjs-keycloak-admin-restful/compare/v1.0.0...v1.1.0) (2022-06-10)
+
+
+### Features
+
+* Replaces npm with yarn ([9cd5e6d](https://github.com/FORSIT-Group/nestjs-keycloak-admin-restful/commit/9cd5e6d2826a2dbcc799864679c24a59e43b7875))
+* Updates all packages ([511a41d](https://github.com/FORSIT-Group/nestjs-keycloak-admin-restful/commit/511a41db12b26a6fcb8e9bc8f203e176ef8b5698))
+* Updates Node.js ([12c5e43](https://github.com/FORSIT-Group/nestjs-keycloak-admin-restful/commit/12c5e437ec40d40ae9179de0f73025f484883a81))
+* Uses yarn in GitHub workflow ([8e9a1af](https://github.com/FORSIT-Group/nestjs-keycloak-admin-restful/commit/8e9a1afbec64f0325ed78ea39ae35e1236612be0))
+
 # 1.0.0 (2022-06-09)
 
 
