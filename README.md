@@ -1,5 +1,7 @@
 # Keycloak Admin Client for NestJs
 
+This repository is a fork of https://github.com/anonrig/nestjs-keycloak-admin with a restful structure.
+
 ## Initialize KeycloakModule
 
 Adjust your `app.module.ts` like this, to activated the authentication and authorization guards.
@@ -107,3 +109,13 @@ export class GatedEndpointController {
     }
 }
 ```
+
+## Release process
+
+The release is made manually of the master branch. To create a new release, do these steps:
+
+1. Adjust `version` in [package.json](package.json).
+2. Commit and push the changes.
+3. Go to the [release workflow](https://github.com/FORSIT-Group/nestjs-keycloak-admin-restful/actions/workflows/release.yml) in GitHub Actions.
+4. There you have a dropdown button with the text `Run workflow`. If you don't see it, you need rights to run GitHub Actions.
+5. Click on the button, select the master branch and click on `Run workflow`.
