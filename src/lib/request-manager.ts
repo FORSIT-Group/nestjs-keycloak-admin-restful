@@ -11,7 +11,7 @@ export class RequestManager {
     this.client = client
     this.requester = Axios.create({ baseURL })
     this.requester.interceptors.request.use(async (config) => {
-      if (config.headers?.authorization?.length) {
+      if (config.headers?.authorization && config.headers.authorization.toString().length) {
         return config
       }
 
